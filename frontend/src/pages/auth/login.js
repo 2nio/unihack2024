@@ -1,40 +1,29 @@
-import React, {useState} from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import React, { useState } from "react";
 
 const Login = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    const handleLogin = (e) => {
-        e.preventDefault();
-        if (email && password) {
-            Alert.alert('Login', `Logging in with Email: ${email}`);
-          } else {
-            Alert.alert('Error', 'Please fill in both fields');
-          }
-        //
-    };
-
     return (
         <div class="ic-main">
             <div>
                 <div class="ic-link">
-                    <a href ="/signup">Need a Univ Account?<br/>
-                    Click Here, It's Free!</a>
+                    <a href="/signup">Need a Univ Account?<br />
+                        Click Here, It's Free!</a>
                 </div>
                 <div class="ic-title">
                     <h2>Univ.HUB</h2>
                 </div>
-                <form onSubmit={handleLogin}>
+                <form>
                     <div class="ic-label">
                         <label>Email:</label>
                     </div>
                     <div class="ic-input">
                         <input
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
                         />
                     </div>
                     <div class="ic-label">
@@ -42,10 +31,10 @@ const Login = () => {
                     </div>
                     <div class="ic-input">
                         <input
-                        type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
+                            type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
                         />
                     </div>
                     <div class="ic-log">

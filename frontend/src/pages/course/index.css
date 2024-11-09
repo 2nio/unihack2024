@@ -8,7 +8,7 @@
 .course-second {
     display: flex;
     width: 100%;
-    height: 90vh;
+    height: 88vh;
 }
 
 .course-feed {
@@ -31,6 +31,10 @@
     border-radius: 8px;
 }
 
+.course-material:hover {
+    background-color: rgb(220, 220, 220);
+}
+
 .course-material p {
     font-size: 14px;
 }
@@ -39,6 +43,41 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: aliceblue;
-    width: 200px;
+    width: 100px;
+    gap: 8px;
+}
+
+.course-material-right {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100px;
+    gap: 8px;
+}
+
+.course-material-file {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid black;
+    border-radius: 40px;
+    padding: 6px;
+    margin-top: 8px;
+}
+
+.course-material-file button {
+    border: none;
+    background-color: white;
+    font-size: 13px;
+    color: rgba(0, 0, 0, 0.6);
+    cursor: pointer;
+}
+
+.course-material-file button:hover {
+    color: #1ca7ec;
+}
+
+.course-material-file p {
+    margin: 0;
+    font-size: 14px;
 }
