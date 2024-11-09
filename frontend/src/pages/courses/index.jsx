@@ -157,7 +157,7 @@ export default function CourseManagement() {
           EDU.hub - Teacher
         </Typography>
         <List>
-          {['./dashboard', 'Courses', 'Calendar', 'Inbox', 'History', 'Profile'].map((page) => (
+          {['Dashboard', 'Courses', 'Calendar', 'Inbox', 'History', 'Profile'].map((page) => (
             <ListItem button key={page}>
               <ListItemText primary={page} />
             </ListItem>

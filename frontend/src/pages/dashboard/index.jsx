@@ -1,37 +1,60 @@
 import React, { useState } from "react";
 import { PieChart } from "@mui/x-charts/PieChart";
-import { Sidebar, Menu, MenuItem, Submenu, Logo } from "react-mui-sidebar";
-import { Button, IconButton } from "@mui/material";
-import MenuIcon from "@mui/icons-material/Menu";
-import Box from '@mui/material/Box';
-import AppBar from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
-import './index.css';
-
-import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
-
+import { Button, Box, Typography, AppBar, Toolbar, Tabs, Tab, FormControl, InputLabel, Select, MenuItem, TextField, Chip } from "@mui/material";
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import dayjs from "dayjs";
 
 const DynamicPie = () => {
-  const [selectedTab, setSelectedTab] = React.useState(0);
+  const [selectedTab, setSelectedTab] = useState(0);
   const [percent, setPercent] = useState("");
   const [label, setLabel] = useState("Final Exam");
   const [customLabel, setCustomLabel] = useState("");
   const [customPercent, setCustomPercent] = useState("");
   const [showCustomForm, setShowCustomForm] = useState(false);
   const [selectedGroup, setSelectedGroup] = useState("");
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [warningMessage, setWarningMessage] = useState("");
+  const [submitMessage, setSubmitMessage] = useState("");
+  const [submittedGroups, setSubmittedGroups] = useState({});
+
+
+  const [selectedCourse, setSelectedCourse] = useState("");
+  const [uniqueKey, setUniqueKey] = useState("");
+  const [isVerified, setIsVerified] = useState(false);
+  const [selectedGroups, setSelectedGroups] = useState([]);
+
 
   const [groupData, setGroupData] = useState({
     "Group A - Math": [{ data: [{ id: 0, value: 100, label: "*Remaining" }] }],
     "Group B - Science": [{ data: [{ id: 0, value: 100, label: "*Remaining" }] }],
+    "Group C - History": [{ data: [{ id: 0, value: 100, label: "*Remaining" }] }],
   });
 
-  const handleTabChange = (event, newValue) => {
-    setSelectedTab(newValue);
+  const courses = [
+    { id: "101", name: "Math 101" },
+    { id: "202", name: "Physics 202" },
+    { id: "303", name: "Chemistry 303" },
+  ];
+
+  const handleVerifyKey = () => {
+    if (uniqueKey.length === 6 && /^[0-9]+$/.test(uniqueKey)) {
+      setIsVerified(true);
+      setWarningMessage("");
+    } else {
+      setWarningMessage("Invalid key. Please enter a 6-digit number.");
+      setIsVerified(false);
+    }
   };
+
+  const handleGroupSelection = (event) => {
+    const { value } = event.target;
+    if (value.length <= 100) {
+      setSelectedGroups(value);
+    } else {
+      setWarningMessage("You can select up to 100 groups.");
+    }
+  };
+
+  const handleTabChange = (event, newValue) => setSelectedTab(newValue);
 
   const handleAddSlice = (e) => {
     e.preventDefault();
@@ -50,6 +73,13 @@ const DynamicPie = () => {
     if (remainingPercentage < 0) {
       alert("Total value of new slices cannot exceed the remaining percentage.");
       return;
+    }
+
+    if (groupData[selectedGroup][0].data.length >= 7) {
+      setWarningMessage("Limit reached (6 slices)");
+      return;
+    } else {
+      setWarningMessage("");
     }
 
     const updatedData = [
@@ -72,7 +102,6 @@ const DynamicPie = () => {
 
   const handleAddCustomSlice = (e) => {
     e.preventDefault();
-
     const newValue = Number(customPercent);
     const newLabel = customLabel;
 
@@ -87,6 +116,13 @@ const DynamicPie = () => {
     if (remainingPercentage < 0) {
       alert("Total value of new slices cannot exceed the remaining percentage.");
       return;
+    }
+
+    if (groupData[selectedGroup][0].data.length >= 7) {
+      setWarningMessage("Limit reached (6 slices)");
+      return;
+    } else {
+      setWarningMessage("");
     }
 
     const updatedData = [
@@ -127,117 +163,183 @@ const DynamicPie = () => {
     }));
   };
 
+  const handleSubmitScheme = () => {
+    if (!selectedGroup) {
+      setWarningMessage("Choose a group!");
+      return;
+    }
+
+    if (groupData[selectedGroup][0].data[0].value > 0) {
+      setSubmitMessage("Remaining percentage must be 0 to submit.");
+    } else {
+      const submissionDate = dayjs().format("DD/MM/YY HH:mm");
+      setSubmittedGroups(prev => ({
+        ...prev,
+        [selectedGroup]: submissionDate,
+      }));
+
+    }
+  };
+
+  const selectedGroupData = selectedGroup && groupData[selectedGroup] ? groupData[selectedGroup][0].data : [];
+
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: 'flex', height: '100vh' }}>
       {/* Sidebar */}
-      <Box sx={{ width: '13%', bgcolor: '#1976d2', color: 'white', padding: 2, height: '100vh', position: 'fixed' }}>
-      <Typography variant="h6" sx={{ flexGrow: 1 }}>
-              EDU.hub - Teacher
-            </Typography>
+      <Box sx={{ width: '250px', bgcolor: '#1c1c1c', color: 'white', padding: 2, display: 'flex', flexDirection: 'column' }}>
+        <Typography variant="h6" sx={{ fontWeight: 'bold', marginBottom: 3 }}>
+          EDU.hub
+        </Typography>
+
+        <Button variant="text" color="inherit" sx={{ marginBottom: 2 }}>Dashboard</Button>
+        <Button variant="text" color="inherit" sx={{ marginBottom: 2 }}>Grading Schemes</Button>
+        <Button variant="text" color="inherit" sx={{ marginBottom: 2 }}>Assign Courses</Button>
+        <Button variant="text" color="inherit" sx={{ marginBottom: 2 }}>Log Out</Button>
       </Box>
-    
-    <Box sx={{  marginLeft: '15%', width: '85%'}}>
-      <AppBar position="static">
-        <Toolbar>
-          <Tabs
-            value={selectedTab}
-            onChange={handleTabChange}
-            textColor="inherit"
-            indicatorColor="secondary"
-          >
-            <Tab label="GRADING SCHEMES" />
-            <Tab label="ASSIGN COURSES" />
-          </Tabs>
-          <Tab label="Log Out"></Tab>
-        </Toolbar>
-      </AppBar>
 
-      {selectedTab === 0 && (
-        <Box sx={{ height: 400, width: '100%', padding: 2 }}>
-          <div className="container">
-            <div className="dsb-main">
-              <h2>Select a Group and Course</h2>
-              <select value={selectedGroup} onChange={(e) => setSelectedGroup(e.target.value)}>
-                <option value="">Select a Group and Course</option>
-                <option value="Group A - Math">Group A - Math</option>
-                <option value="Group B - Science">Group B - Science</option>
-              </select>
+      {/* Main Content */}
+      <Box sx={{ width: '100%', padding: 3 }}>
+        {/* App Bar */}
+        <AppBar position="static" sx={{ backgroundColor: '#fff', boxShadow: 'none', padding: 3, justifyContent: 'flex-start'}}>
+          <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Tabs value={selectedTab} onChange={handleTabChange} textColor="primary" indicatorColor="primary">
+              <Tab label="Grading Schemes" />
+              <Tab label="Assign Courses" />
+            </Tabs>
+          </Toolbar>
+        </AppBar>
 
-              {selectedGroup && (
-                <>
-                  <PieChart series={groupData[selectedGroup]} width={400} height={200} />
 
-                  <form onSubmit={handleAddSlice}>
-                    <div className="bsd-input">
-                      <input
-                        type="number"
-                        value={percent}
-                        onChange={(e) => setPercent(e.target.value)}
-                        placeholder="Enter percentage"
-                        min="0"
-                        max="100"
+        {/* Content Area */}
+        <Box sx={{ display: 'flex', flexDirection: 'row' }}>
+          {/* Left Section: Form */}
+          <Box sx={{ width: '50%', paddingRight: 3 }}>
+            <Typography variant="h5" sx={{ marginBottom: 2 }}>Create or Edit Grading Scheme</Typography>
+
+            <FormControl fullWidth variant="outlined" sx={{ marginBottom: 2 }}>
+              <InputLabel>Select Group</InputLabel>
+              <Select value={selectedGroup} onChange={(e) => setSelectedGroup(e.target.value)} label="Select Group">
+                <MenuItem value="">None</MenuItem>
+                <MenuItem value="Group A - Math">Group A - Math</MenuItem>
+                <MenuItem value="Group B - Science">Group B - Science</MenuItem>
+                <MenuItem value="Group C - History">Group C - History</MenuItem>
+              </Select>
+            </FormControl>
+
+            {selectedGroup && (
+              <>
+                <form onSubmit={handleAddSlice}>
+                  <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2, alignItems: 'center' }}>
+                    <TextField
+                      label="Percentage"
+                      variant="outlined"
+                      type="number"
+                      value={percent}
+                      onChange={(e) => setPercent(e.target.value)}
+                      required
+                      sx={{ marginBottom: 2 }}
+                    />
+                    <FormControl variant="outlined" sx={{ minWidth: 120 }}>
+                      <InputLabel>Label</InputLabel>
+                      <Select value={label} onChange={(e) => setLabel(e.target.value)} label="Label">
+                        <MenuItem value="Final Exam">Final Exam</MenuItem>
+                        <MenuItem value="Midterm">Midterm</MenuItem>
+                        <MenuItem value="Assignment">Assignment</MenuItem>
+                      </Select>
+                    </FormControl>
+                  </Box>
+                  <Button type="submit" variant="contained" color="primary" sx={{ marginBottom: 2 }}>Add Slice</Button>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    onClick={() => setShowCustomForm(!showCustomForm)}
+                    sx={{ marginBottom: 2, marginLeft: 2 }}
+                  >
+                    Add Custom Slice
+                  </Button>
+                </form>
+
+                {showCustomForm && (
+                  <form onSubmit={handleAddCustomSlice}>
+                    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                      <TextField
+                        label="Custom Label"
+                        variant="outlined"
+                        value={customLabel}
+                        onChange={(e) => setCustomLabel(e.target.value)}
                         required
+                        sx={{ marginBottom: 2 }}
                       />
-                      <select className="bsd-select" value={label} onChange={(e) => setLabel(e.target.value)}>
-                        <option value="Final Exam">Final Exam</option>
-                        <option value="Project">Project</option>
-                        <option value="Homework">Homework</option>
-                        <option value="Quiz">Quiz</option>
-                        <option value="Lab Work">Lab Work</option>
-                      </select>
-                    </div>
-                    <div className="bsd-button">
-                      <button type="submit">Add Slice</button>
-                      <button type="button" onClick={() => setShowCustomForm(!showCustomForm)}>
-                        {showCustomForm ? "Cancel Custom" : "Add Custom"}
-                      </button>
-                    </div>
+                      <TextField
+                        label="Percentage"
+                        variant="outlined"
+                        type="number"
+                        value={customPercent}
+                        onChange={(e) => setCustomPercent(e.target.value)}
+                        required
+                        sx={{ marginBottom: 2 }}
+                      />
+                      <Button type="submit" variant="contained" color="secondary">Add Custom Slice</Button>
+                    </Box>
                   </form>
-
-                  {showCustomForm && (
-                    <form onSubmit={handleAddCustomSlice}>
-                      <div>
-                        <input
-                          type="text"
-                          value={customLabel}
-                          onChange={(e) => setCustomLabel(e.target.value)}
-                          placeholder="Enter custom label"
-                          required
-                        />
-                        <input
-                          type="number"
-                          value={customPercent}
-                          onChange={(e) => setCustomPercent(e.target.value)}
-                          placeholder="Enter custom percentage"
-                          min="0"
-                          max="100"
-                          required
-                        />
-                      </div>
-                      <button type="submit">Add Custom Slice</button>
-                    </form>
-                  )}
-
-                  <div>
-                    <h3>Grading Scheme for {selectedGroup}</h3>
-                    <ul>
-                      {groupData[selectedGroup][0].data.slice(1).map((slice, index) => (
-                        <li key={index}>
-                          {slice.label}: {slice.value}%
-                          <button onClick={() => removeSlice(slice.id)} style={{ marginLeft: "10px" }}>
-                            Remove
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
+                )}
+              </>
+            )}
           </Box>
-      )}
-    </Box>
+
+          {/* Right Section: Chart */}
+          <Box sx={{ width: '50%', flexDirection: 'column', justifyContent: 'center' }}>
+            {selectedGroup && selectedGroupData.length > 0 && (
+              <PieChart series={groupData[selectedGroup]} width={600} height={400} />
+            )}
+            <Box sx={{ marginTop: 3 }}>
+              <Typography variant="h6">Grading Scheme for {selectedGroup}</Typography>
+              <ul>
+                {selectedGroupData.slice(1).map((slice, index) => (
+                  <li key={index}>
+                    {slice.label}: {slice.value}%
+                    <Button
+                      onClick={() => removeSlice(slice.id)}
+                      sx={{
+                        color: '#f44336',
+                        marginLeft: 1,
+                        textTransform: 'none',
+                      }}
+                    >
+                      Remove
+                    </Button>
+                  </li>
+                ))}
+              </ul>
+
+              {/* Submit Button */}
+              {!submittedGroups[selectedGroup] ? (
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleSubmitScheme}
+                  sx={{ marginTop: 2 }}
+                >
+                  Submit to Group
+                </Button>
+              ) : (
+                <Box sx={{ display: 'flex', alignItems: 'center', marginTop: 2, color: 'green' }}>
+                  <CheckCircleIcon sx={{ marginRight: 1 }} />
+                  <Typography>Submitted Successfully on {submittedGroups[selectedGroup]}!</Typography>
+                </Box>
+              )}
+            </Box>
+
+            {/* Warning and Success Messages */}
+            {warningMessage && <Typography color="error" sx={{ marginTop: 2 }}>{warningMessage}</Typography>}
+            {submitMessage && (
+              <Typography color={submitMessage.includes("successfully") ? "green" : "error"} sx={{ marginTop: 2 }}>
+                {submitMessage}
+              </Typography>
+            )}
+          </Box>
+        </Box>
+      </Box>
     </Box>
   );
 };
