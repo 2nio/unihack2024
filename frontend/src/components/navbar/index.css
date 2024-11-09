@@ -1,0 +1,41 @@
+.navbar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 4px;
+    border-bottom: 1px solid black;
+    justify-content: center;
+    width: 100%;
+    margin-left: 8px;
+}
+
+.navbar p {
+    margin: 0;
+}
+
+.navbar ul {
+    font-size: 14px;
+    padding: 8px;
+    margin: 4px 48px;
+    display: flex;
+    list-style-type: none;
+    gap: 24px;
+    cursor: pointer;
+}
+
+.navbar li {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.navbar li:hover {
+    color: #1ca7ec;
+}
+
+.navbar-user {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+}
