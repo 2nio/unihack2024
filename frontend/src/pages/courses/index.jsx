@@ -150,27 +150,27 @@ export default function CourseManagement() {
   ];
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: 'flex', height: '100vh'}}>
       {/* Sidebar */}
-      <Box sx={{ width: '13%', bgcolor: '#1976d2', color: 'white', padding: 2, height: '100vh', position: 'fixed' }}>
-        <Typography variant="h6" sx={{ flexGrow: 1, mb: 2 }}>
-          EDU.hub - Teacher
+      <Box sx={{ width: '250px', bgcolor: '#1c1c1c', color: 'white', padding: 2, display: 'flex', flexDirection: 'column' }}>
+        <Typography variant="h6" sx={{ fontWeight: 'bold', marginBottom: 3 }}>
+          EDU.Teacher
         </Typography>
-        <List>
-          {['Dashboard', 'Courses', 'Calendar', 'Inbox', 'History', 'Profile'].map((page) => (
-            <ListItem button key={page}>
-              <ListItemText primary={page} />
-            </ListItem>
-          ))}
-        </List>
+
+        <Button href="/dashboard" variant="text" color="inherit" sx={{ marginBottom: 2, justifyContent: 'flex-start'}}>Dashboard</Button>
+        <Button href="/courses" variant="text" color="inherit" sx={{ marginBottom: 2, justifyContent: 'flex-start', textDecoration: 'underline' }}>Classes</Button>
+        <Button href="/calendar" variant="text" color="inherit" sx={{ marginBottom: 2, justifyContent: 'flex-start' }}>Calendar</Button>
+        <Button href="/inbox" variant="text" color="inherit" sx={{ marginBottom: 2, justifyContent: 'flex-start'}}>Inbox</Button>
+        <Button href="/courses" variant="text" color="inherit" sx={{ marginBottom: 2, justifyContent: 'flex-start', fontWeight:'bold' }}>Log Out</Button>
       </Box>
 
-      <Box sx={{ marginLeft: '15%', width: '85%' }}>
-        <AppBar position="static">
-          <Toolbar>
-            <Tabs value={selectedTab} onChange={handleTabChange} textColor="inherit" indicatorColor="secondary">
-              <Tab label="Browse Course" />
-              <Tab label="Create New Course" />
+      <Box sx={{ width: '100%', padding: 3}}>
+        {/* App Bar */}
+        <AppBar position="static" sx={{ backgroundColor: '#fff', boxShadow: 'none', padding: 3, justifyContent: 'flex-start'}}>
+          <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Tabs value={selectedTab} onChange={handleTabChange} textColor="primary" indicatorColor="primary">
+              <Tab label="Browse Classes" />
+              <Tab label="Create New Class" />
             </Tabs>
           </Toolbar>
         </AppBar>
@@ -268,7 +268,7 @@ export default function CourseManagement() {
               />
             </LocalizationProvider>
 
-            <Button variant="contained" color="primary" onClick={handleAddCourse} sx={{ mt: 2 }}>
+            <Button variant="contained" color="primary" onClick={handleAddCourse} sx={{ mt: 4 }}>
               Add Course
             </Button>
 

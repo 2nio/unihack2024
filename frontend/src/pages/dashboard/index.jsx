@@ -35,6 +35,8 @@ const DynamicPie = () => {
     { id: "303", name: "Chemistry 303" },
   ];
 
+  const groups = ["Group A - Math", "Group B - Science", "Group C - History"];
+
   const handleVerifyKey = () => {
     if (uniqueKey.length === 6 && /^[0-9]+$/.test(uniqueKey)) {
       setIsVerified(true);
@@ -188,18 +190,18 @@ const DynamicPie = () => {
       {/* Sidebar */}
       <Box sx={{ width: '250px', bgcolor: '#1c1c1c', color: 'white', padding: 2, display: 'flex', flexDirection: 'column' }}>
         <Typography variant="h6" sx={{ fontWeight: 'bold', marginBottom: 3 }}>
-          EDU.hub
+          EDU.Teacher
         </Typography>
 
-        <Button variant="text" color="inherit" sx={{ marginBottom: 2 }}>Dashboard</Button>
-        <Button variant="text" color="inherit" sx={{ marginBottom: 2 }}>Grading Schemes</Button>
-        <Button variant="text" color="inherit" sx={{ marginBottom: 2 }}>Assign Courses</Button>
-        <Button variant="text" color="inherit" sx={{ marginBottom: 2 }}>Log Out</Button>
+        <Button href="/dashboard" variant="text" color="inherit" sx={{ marginBottom: 2, justifyContent: 'flex-start', textDecoration: 'underline'}}>Dashboard</Button>
+        <Button href="/courses" variant="text" color="inherit" sx={{ marginBottom: 2, justifyContent: 'flex-start' }}>Classes</Button>
+        <Button href="/calendar" variant="text" color="inherit" sx={{ marginBottom: 2, justifyContent: 'flex-start' }}>Calendar</Button>
+        <Button href="/inbox" variant="text" color="inherit" sx={{ marginBottom: 2, justifyContent: 'flex-start'}}>Inbox</Button>
+        <Button href="/courses" variant="text" color="inherit" sx={{ marginBottom: 2, justifyContent: 'flex-start', fontWeight:'bold' }}>Log Out</Button>
       </Box>
 
-      {/* Main Content */}
+      {selectedTab === 0 && (
       <Box sx={{ width: '100%', padding: 3 }}>
-        {/* App Bar */}
         <AppBar position="static" sx={{ backgroundColor: '#fff', boxShadow: 'none', padding: 3, justifyContent: 'flex-start'}}>
           <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
             <Tabs value={selectedTab} onChange={handleTabChange} textColor="primary" indicatorColor="primary">
@@ -248,12 +250,12 @@ const DynamicPie = () => {
                       </Select>
                     </FormControl>
                   </Box>
-                  <Button type="submit" variant="contained" color="primary" sx={{ marginBottom: 2 }}>Add Slice</Button>
+                  <Button type="submit" variant="contained" color="primary" sx={{ marginBottom: 2, width: 150 }}>Add Slice</Button>
                   <Button
                     variant="contained"
                     color="secondary"
                     onClick={() => setShowCustomForm(!showCustomForm)}
-                    sx={{ marginBottom: 2, marginLeft: 2 }}
+                    sx={{ marginBottom: 2, width: 150}}
                   >
                     Add Custom Slice
                   </Button>
@@ -279,7 +281,7 @@ const DynamicPie = () => {
                         required
                         sx={{ marginBottom: 2 }}
                       />
-                      <Button type="submit" variant="contained" color="secondary">Add Custom Slice</Button>
+                      <Button type="submit" variant="contained" color="secondary">Add Slice</Button>
                     </Box>
                   </form>
                 )}
@@ -340,6 +342,125 @@ const DynamicPie = () => {
           </Box>
         </Box>
       </Box>
+        )}
+        {selectedTab === 1 && (
+  <Box sx={{ width:'100%', padding: 3 }}>
+    <AppBar position="static" sx={{ backgroundColor: '#fff', boxShadow: 'none', padding: 3, justifyContent: 'flex-start'}}>
+      <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
+        <Tabs value={selectedTab} onChange={handleTabChange} textColor="primary" indicatorColor="primary">
+          <Tab label="Grading Schemes" />
+          <Tab label="Assign Courses" />
+        </Tabs>
+      </Toolbar>
+    </AppBar>
+
+    <Box sx={{ marginTop: 3 }}>
+      <Typography variant="h5" sx={{ marginBottom: 2 }}>
+        Assign Courses to Groups
+      </Typography>
+
+      {/* Course Assignment Form */}
+      <FormControl fullWidth variant="outlined" sx={{ marginBottom: 2 }}>
+              <InputLabel>Select Course</InputLabel>
+              <Select
+                value={selectedCourse}
+                onChange={(e) => setSelectedCourse(e.target.value)}
+                label="Select Course"
+              >
+                <MenuItem value="">None</MenuItem>
+                {courses.map((course) => (
+                  <MenuItem key={course.id} value={course.id}>
+                    {course.name} (ID: {course.id})
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+
+            {selectedCourse && (
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, marginBottom: 2 }}>
+                <TextField
+                  label="Unique Key"
+                  variant="outlined"
+                  type="text"
+                  value={uniqueKey}
+                  onChange={(e) => setUniqueKey(e.target.value)}
+                />
+                <Button variant="contained" color="primary" onClick={handleVerifyKey}>
+                  Verify Key
+                </Button>
+              </Box>
+            )}
+
+{isVerified && (
+              <FormControl fullWidth variant="outlined" sx={{ marginTop: 3 }}>
+                <InputLabel>Select Groups</InputLabel>
+                <Select
+                  multiple
+                  value={selectedGroups}
+                  onChange={handleGroupSelection}
+                  label="Select Groups"
+                  renderValue={(selected) => (
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                      {selected.map((value) => (
+                        <Chip key={value} label={value} />
+                      ))}
+                    </Box>
+                  )}
+                >
+                  {groups.map((group) => (
+                    <MenuItem key={group} value={group}>
+                      {group}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            )}
+
+            {/* Warning Message */}
+            {warningMessage && (
+              <Typography color="error" sx={{ marginTop: 2 }}>
+                {warningMessage}
+              </Typography>
+            )}
+
+{/* Assign Course to Group Button */}
+<Button
+  variant="contained"
+  color="primary"
+  onClick={() => {
+    if (!selectedCourse || !selectedGroup) {
+      alert('Please select both a course and a group.');
+      return;
+    }
+
+    const selectedCourseName = courses.find(c => c.id === selectedCourse)?.name;
+    if (!selectedCourseName) {
+      alert('Invalid course selected.');
+      return;
+    }
+
+    alert(`Assigned ${selectedCourseName} to ${selectedGroup}`);
+  }}
+  sx={{ marginTop: 2 }}
+>
+  Assign Course
+</Button>
+
+
+
+      {/* Selected Course and Group Information */}
+      {selectedCourse && selectedGroup && (
+        <Box sx={{ marginTop: 3 }}>
+          <Typography variant="body1">
+            Assigned Course: {courses.find(course => course.id === selectedCourse)?.name}
+          </Typography>
+          <Typography variant="body1">Assigned to: {selectedGroup}</Typography>
+        </Box>)}
+
+
+    </Box>
+  </Box>
+)}
     </Box>
   );
 };
