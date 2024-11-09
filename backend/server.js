@@ -3,6 +3,8 @@ const mongoose = require('mongoose')
 const cors = require('cors')
 const cookieParser = require('cookie-parser')
 const usersRouter = require("./routes/userRoutes")
+const materialsRouter = require("./routes/materialRoutes")
+const coursesRouter = require("./routes/courseRoutes")
 const app = express()
 const PORT = 8080 || process.env.PORT;
 
@@ -29,3 +31,5 @@ mongoose.connect(`mongodb+srv://dbUser:${process.env.mongoPass}@cluster0.ujbe8.m
 
 //Routes
 app.use("/user", usersRouter)
+app.use("/material", materialsRouter)
+app.use("/course", coursesRouter)
