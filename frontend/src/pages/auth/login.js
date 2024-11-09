@@ -1,8 +1,17 @@
 import React, { useState } from "react";
+import { usePost } from "../../hooks/usePost";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const navigate = useNavigate()
+    const { postData, loading } = usePost('user/login')
+
+    const handleLogin = (e) => {
+        e.preventDefault();
+        postData({ email, password }, () => navigate('/'))
+    };
 
     return (
         <div class="ic-main">
@@ -14,7 +23,7 @@ const Login = () => {
                 <div class="ic-title">
                     <h2>Univ.HUB</h2>
                 </div>
-                <form>
+                <form onSubmit={handleLogin}>
                     <div class="ic-label">
                         <label>Email:</label>
                     </div>
