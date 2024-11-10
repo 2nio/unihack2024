@@ -7,59 +7,22 @@ import { useNavigate } from 'react-router-dom'
 function Home() {
 
     const navigate = useNavigate()
-
-    const data = [
-        {
-            name: 'Math',
-            id: '1223F-18567M',
-            professor: 'Mihail Grobovici',
-            description: 'This course is intended for students taking Analysis II in the second year'
-        },
-        {
-            name: 'Geography',
-            id: '1223F-18567M',
-            professor: 'Radu Grobovici',
-            description: 'This course is intended for students taking Geography in the second year'
-        },
-        {
-            name: 'History',
-            id: '1223F-18567M',
-            professor: 'Radu Grobovici',
-            description: 'This course is intended for students taking Geography in the second year'
-        },
-        {
-            name: 'Geography',
-            id: '1223F-18567M',
-            professor: 'Radu Grobovici',
-            description: 'This course is intended for students taking Geography in the second year'
-        },
-        {
-            name: 'Geography',
-            id: '1223F-18567M',
-            professor: 'Radu Grobovici',
-            description: 'This course is intended for students taking Geography in the second year'
-        },
-        {
-            name: 'Geography',
-            id: '1223F-18567M',
-            professor: 'Radu Grobovici',
-            description: 'This course is intended for students taking Geography in the second year'
-        }
-    ]
+    const { data, loading, fetchData } = useFetch('course')
 
     return (
         <div className='home-main'>
             <Navbar />
             <div className='home-courses'>
-                {data.map(item =>
-                    <div className='home-course' onClick={() => navigate('/course')}>
+                {!loading && data?.map(item =>
+                    <div className='home-course'
+                        onClick={() => navigate(`/course/${item._id}`, { state: { id: item._id } })}>
                         <div className='home-course-upper'>
                             <p style={{ fontWeight: '600' }}>{item.name}</p>
-                            <p style={{ fontSize: '13px' }}>{item.id}</p>
+                            <p style={{ fontSize: '13px' }}>{item.courseID}</p>
                         </div>
                         <div className='home-course-lower'>
                             <label>PROFESSOR</label>
-                            <p>{item.professor}</p>
+                            <p>{item.professor.name}</p>
                             <label>DESCRIPTION</label>
                             <p>{item.description}</p>
                         </div>

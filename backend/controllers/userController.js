@@ -12,13 +12,13 @@ const refreshOptions = {
     httpOnly: true,
     maxAge: 60000 * 60 * 24 * 16,
     sameSite: "none",
-    secure: false,
+    secure: true,
 };
 
 const accessOptions = {
     maxAge: 60000 * 5,
     sameSite: "none",
-    secure: false,
+    secure: true,
 };
 
 

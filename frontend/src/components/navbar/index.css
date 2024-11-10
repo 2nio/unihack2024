@@ -6,7 +6,11 @@
     border-bottom: 1px solid black;
     justify-content: center;
     width: 100%;
-    margin-left: 8px;
+    position: fixed;
+    height: 40px;
+    top: 0;
+    background-color: white;
+    z-index: 2;
 }
 
 .navbar p {

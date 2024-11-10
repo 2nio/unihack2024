@@ -19,6 +19,9 @@ const userSchema = new mongoose.Schema({
     role: {
         type: String,
         default: 'student'
+    },
+    test: {
+        type: mongoose.Schema.Types.ObjectId, ref: 'Test',
     }
 })
 
@@ -72,5 +75,5 @@ userSchema.statics.login = async function (email, password) {
 }
 
 
-const userModel = mongoose.model('Users', userSchema)
+const userModel = mongoose.model('User', userSchema)
 module.exports = userModel

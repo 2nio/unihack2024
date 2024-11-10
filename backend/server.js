@@ -5,6 +5,9 @@ const cookieParser = require('cookie-parser')
 const usersRouter = require("./routes/userRoutes")
 const materialsRouter = require("./routes/materialRoutes")
 const coursesRouter = require("./routes/courseRoutes")
+const testsRouter = require("./routes/testRoutes")
+const ocrspaceRouter = require("./api/ocrspace/ocrspaceRouter")
+const openaiRouter = require("./api/openai/openaiRouter")
 const app = express()
 const PORT = 8080 || process.env.PORT;
 
@@ -33,3 +36,6 @@ mongoose.connect(`mongodb+srv://dbUser:${process.env.mongoPass}@cluster0.ujbe8.m
 app.use("/user", usersRouter)
 app.use("/material", materialsRouter)
 app.use("/course", coursesRouter)
+app.use("/test", testsRouter)
+app.use("/ocrspace", ocrspaceRouter)
+app.use("/openai", openaiRouter)

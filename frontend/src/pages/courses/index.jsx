@@ -24,6 +24,9 @@ import DialogContent from '@mui/material/DialogContent';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
+import Navbar from '../../components/navbar';
+import { usePost } from '../../hooks/usePost';
+import { useFetch } from '../../hooks/useFetch';
 
 export default function CourseManagement() {
   // State and Data
@@ -32,15 +35,18 @@ export default function CourseManagement() {
   const [occurrence, setOccurrence] = React.useState('');
   const [startTime, setStartTime] = React.useState(new Date());
   const [type, setType] = React.useState('');
-  const [id, setId] = React.useState('');
-  const [name, setName] = React.useState('');
+  const [id, setId] = React.useState(null);
+  const [description, setDescription] = React.useState(null);
+  const [name, setName] = React.useState(null);
+  const [professor, setProfessor] = React.useState(null);
   const [successMessage, setSuccessMessage] = React.useState(false);
   const [deleteMessage, setDeleteMessage] = React.useState('');
   const [rows, setRows] = React.useState([]);
   const [openEditDialog, setOpenEditDialog] = React.useState(false);
   const [editingRow, setEditingRow] = React.useState(null);
   const [currentTime, setCurrentTime] = React.useState(new Date()); // New state for real-time time
-
+  const { postData, loading } = usePost('course')
+  const { data, loading: loadingUser, fetchData } = useFetch('user/current')
   // Course Name and ID Mapping (Dropdown options)
   const courseOptions = [
     { name: 'Course 1', id: 'C1' },
@@ -78,7 +84,7 @@ export default function CourseManagement() {
     const courseOccurrences = [];
     const endDate = new Date('2025-01-30');
     const currentDate = new Date('2024-10-01');
-    
+
     while (currentDate <= endDate) {
       const day = currentDate.getDay();
       const isSelectedDay = selectedDays.includes(['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'][day - 1]);
@@ -107,6 +113,8 @@ export default function CourseManagement() {
     setType('');
     setId('');
     setStartTime(new Date());
+
+    postData({ name, description, courseID: id, professor: data?._id })
   };
 
   const handleDeleteRow = (id) => {
@@ -150,156 +158,138 @@ export default function CourseManagement() {
   ];
 
   return (
-    <Box sx={{ display: 'flex' }}>
-      {/* Sidebar */}
-      <Box sx={{ width: '13%', bgcolor: '#1976d2', color: 'white', padding: 2, height: '100vh', position: 'fixed' }}>
-        <Typography variant="h6" sx={{ flexGrow: 1, mb: 2 }}>
-          EDU.hub - Teacher
-        </Typography>
-        <List>
-          {['Dashboard', 'Courses', 'Calendar', 'Inbox', 'History', 'Profile'].map((page) => (
-            <ListItem button key={page}>
-              <ListItemText primary={page} />
-            </ListItem>
-          ))}
-        </List>
-      </Box>
+    <>
+      <Navbar />
+      <Box sx={{ display: 'flex', height: '100vh' }}>
+        <Box sx={{ width: '100%', padding: 3 }}>
+          {/* App Bar */}
+          <AppBar position="static" sx={{ backgroundColor: '#fff', boxShadow: 'none', padding: 3, justifyContent: 'flex-start' }}>
+            <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
+              <Tabs value={selectedTab} onChange={handleTabChange} textColor="primary" indicatorColor="primary">
+                <Tab label="Browse Classes" />
+                <Tab label="Create New Class" />
+              </Tabs>
+            </Toolbar>
+          </AppBar>
 
-      <Box sx={{ marginLeft: '15%', width: '85%' }}>
-        <AppBar position="static">
-          <Toolbar>
-            <Tabs value={selectedTab} onChange={handleTabChange} textColor="inherit" indicatorColor="secondary">
-              <Tab label="Browse Course" />
-              <Tab label="Create New Course" />
-            </Tabs>
-          </Toolbar>
-        </AppBar>
+          {selectedTab === 0 && (
+            <Box sx={{ padding: 2 }}>
+              {/* Real-time date and week type */}
+              <Typography variant="subtitle1">
+                {currentTime.toLocaleString('en-GB')}
+              </Typography>
 
-        {selectedTab === 0 && (
-          <Box sx={{ padding: 2 }}>
-            {/* Real-time date and week type */}
-            <Typography variant="subtitle1">
-              {currentTime.toLocaleString('en-GB')}
-            </Typography>
-
-            <Box sx={{ height: 400, width: '100%', marginTop: 2 }}>
-              <DataGrid rows={rows} columns={columns} pageSize={5} disableRowSelectionOnClick />
-              {deleteMessage && <Alert severity="error" sx={{ mt: 2 }}>{deleteMessage}</Alert>}
+              <Box sx={{ height: 400, width: '100%', marginTop: 2 }}>
+                <DataGrid rows={rows} columns={columns} pageSize={5} disableRowSelectionOnClick />
+                {deleteMessage && <Alert severity="error" sx={{ mt: 2 }}>{deleteMessage}</Alert>}
+              </Box>
             </Box>
-          </Box>
-        )}
+          )}
 
-        {selectedTab === 1 && (
-          <Box sx={{ padding: 2 }}>
-            <Typography variant="h5">Create a New Course</Typography>
+          {selectedTab === 1 && (
+            <Box sx={{ padding: 2 }}>
+              <Typography variant="h5">Create a New Course</Typography>
 
-            <FormControl fullWidth margin="normal">
-              <Typography variant="subtitle1">NAME</Typography>
-              <Select value={name} onChange={(e) => {
-                const selectedCourse = courseOptions.find(course => course.name === e.target.value);
-                setName(e.target.value);
-                setId(selectedCourse ? selectedCourse.id : '');
-              }}>
-                {courseOptions.map((option) => (
-                  <MenuItem key={option.id} value={option.name}>
-                    {option.name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+              <FormControl fullWidth margin="normal">
+                <Typography variant="subtitle1">NAME</Typography>
+                <TextField fullWidth margin="normal" onChange={e => setName(e.target.value)} />
+              </FormControl>
+              <Typography variant="subtitle1">DESCRIPTION</Typography>
+              <TextField fullWidth margin="normal" onChange={e => setDescription(e.target.value)} />
+              <Typography variant="subtitle1">ID</Typography>
+              <TextField fullWidth margin="normal" onChange={e => setId(e.target.value)} />
+              <FormControl fullWidth margin="normal">
+                <Typography variant="subtitle1">TYPE</Typography>
+                <Select value={type} onChange={(e) => setType(e.target.value)}>
+                  {['COURSE', 'LABORATORY', 'SEMINARY'].map((option) => (
+                    <MenuItem key={option} value={option}>
+                      {option}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
 
-            <TextField label="ID" fullWidth margin="normal" value={id} disabled />
-            <FormControl fullWidth margin="normal">
-              <Typography variant="subtitle1">TYPE</Typography>
-              <Select value={type} onChange={(e) => setType(e.target.value)}>
-                {['CURS', 'LAB', 'PROIECT', 'SEM', 'PREZENTARE', 'EXAMEN', 'VERIFICARE'].map((option) => (
-                  <MenuItem key={option} value={option}>
-                    {option}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-
-            <Typography variant="subtitle1" gutterBottom>
-              DAYS OF WEEK
-            </Typography>
-            <Box>
-              {['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'].map((day) => (
-                <FormControlLabel
-                  key={day}
-                  control={
-                    <Checkbox
-                      checked={selectedDays.includes(day)}
-                      onChange={() => handleDayToggle(day)}
-                    />
-                  }
-                  label={day}
-                />
-              ))}
-            </Box>
-
-            <FormControl component="fieldset" margin="normal">
-              <Typography variant="subtitle1">OCCURRENCE</Typography>
-              <RadioGroup
-                value={occurrence}
-                onChange={(e) => setOccurrence(e.target.value)}
-                row
-              >
-                {['EVEN', 'ODD', 'EVEN&ODD'].map((option) => (
+              <Typography variant="subtitle1" gutterBottom>
+                DAYS OF WEEK
+              </Typography>
+              <Box>
+                {['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'].map((day) => (
                   <FormControlLabel
-                    key={option}
-                    value={option}
-                    control={<Radio />}
-                    label={option}
+                    key={day}
+                    control={
+                      <Checkbox
+                        checked={selectedDays.includes(day)}
+                        onChange={() => handleDayToggle(day)}
+                      />
+                    }
+                    label={day}
                   />
                 ))}
-              </RadioGroup>
-            </FormControl>
+              </Box>
 
-            <Typography variant="subtitle1" gutterBottom>
-              TIME
-            </Typography>
-            <LocalizationProvider dateAdapter={AdapterDateFns}>
-              <TimePicker
-                label="Select Time"
-                value={startTime}
-                onChange={(newTime) => setStartTime(newTime)}
-                renderInput={(params) => <TextField {...params} />}
-              />
-            </LocalizationProvider>
+              <FormControl component="fieldset" margin="normal">
+                <Typography variant="subtitle1">OCCURRENCE</Typography>
+                <RadioGroup
+                  value={occurrence}
+                  onChange={(e) => setOccurrence(e.target.value)}
+                  row
+                >
+                  {['EVEN', 'ODD', 'EVEN&ODD'].map((option) => (
+                    <FormControlLabel
+                      key={option}
+                      value={option}
+                      control={<Radio />}
+                      label={option}
+                    />
+                  ))}
+                </RadioGroup>
+              </FormControl>
 
-            <Button variant="contained" color="primary" onClick={handleAddCourse} sx={{ mt: 2 }}>
-              Add Course
-            </Button>
+              <Typography variant="subtitle1" gutterBottom>
+                TIME
+              </Typography>
+              <LocalizationProvider dateAdapter={AdapterDateFns}>
+                <TimePicker
+                  label="Select Time"
+                  value={startTime}
+                  onChange={(newTime) => setStartTime(newTime)}
+                  renderInput={(params) => <TextField {...params} />}
+                />
+              </LocalizationProvider>
 
-            {successMessage && (
-              <Alert severity="success" sx={{ mt: 2 }}>
-                COURSE ADDED SUCCESSFULLY
-              </Alert>
-            )}
-          </Box>
-        )}
+              <Button style={{ marginLeft: '320px' }} variant="contained" color="primary" onClick={handleAddCourse} sx={{ mt: 4 }}>
+                Add Course
+              </Button>
 
+              {successMessage && (
+                <Alert severity="success" sx={{ mt: 2 }}>
+                  COURSE ADDED SUCCESSFULLY
+                </Alert>
+              )}
+            </Box>
+          )}
+
+        </Box>
+
+        {/* Edit Dialog */}
+        <Dialog open={openEditDialog} onClose={() => setOpenEditDialog(false)}>
+          <DialogContent>
+            <TextField label="ID" fullWidth margin="normal" value={editingRow?.id} onChange={(e) => setEditingRow({ ...editingRow, id: e.target.value })} />
+            <TextField label="Name" fullWidth margin="normal" value={editingRow?.name} onChange={(e) => setEditingRow({ ...editingRow, name: e.target.value })} />
+            <Select value={editingRow?.type} onChange={(e) => setEditingRow({ ...editingRow, type: e.target.value })}>
+              {['COURSE', 'LABORATORY', 'PROJECT', 'SEMINARY'].map((option) => (
+                <MenuItem key={option} value={option}>
+                  {option}
+                </MenuItem>
+              ))}
+            </Select>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setOpenEditDialog(false)}>Cancel</Button>
+            <Button onClick={handleSaveEdit}>Save</Button>
+          </DialogActions>
+        </Dialog>
       </Box>
-
-      {/* Edit Dialog */}
-      <Dialog open={openEditDialog} onClose={() => setOpenEditDialog(false)}>
-        <DialogContent>
-          <TextField label="ID" fullWidth margin="normal" value={editingRow?.id} onChange={(e) => setEditingRow({...editingRow, id: e.target.value})} />
-          <TextField label="Name" fullWidth margin="normal" value={editingRow?.name} onChange={(e) => setEditingRow({...editingRow, name: e.target.value})} />
-          <Select value={editingRow?.type} onChange={(e) => setEditingRow({...editingRow, type: e.target.value})}>
-            {['CURS', 'LAB', 'PROIECT', 'SEM', 'PREZENTARE', 'EXAMEN', 'VERIFICARE'].map((option) => (
-              <MenuItem key={option} value={option}>
-                {option}
-              </MenuItem>
-            ))}
-          </Select>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenEditDialog(false)}>Cancel</Button>
-          <Button onClick={handleSaveEdit}>Save</Button>
-        </DialogActions>
-      </Dialog>
-    </Box>
+    </>
   );
 }

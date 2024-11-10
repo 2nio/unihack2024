@@ -7,6 +7,7 @@ import Dashboard from './pages/dashboard'
 import Courses from './pages/courses'
 import Login from './pages/auth/login'
 import Signup from './pages/auth/signup'
+import Comprehension from './pages/comprehension'
 
 
 const App = () =>
@@ -17,8 +18,9 @@ const App = () =>
       <Route path='/course/*' element={<Course />} />
       <Route path='/login' element={<Login />} />
       <Route path='/signup' element={<Signup />} />
-      <Route path='/dashboard'element={<Dashboard/>}/>
-      <Route path='/courses'element={<Courses/>}/>
+      <Route path='/course/grades'element={<Dashboard/>}/>
+      <Route path='/create'element={<Courses/>}/>
+      <Route path='/comprehension'element={<Comprehension/>}/>
     </Routes>
   </>
 )

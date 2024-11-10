@@ -5,18 +5,17 @@ const courseSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    students: {
-        type: String,
+    students: [{
+        type: mongoose.Schema.Types.ObjectId, ref: 'User',
         required: true,
-        unique: true
-    },
+    }],
     courseID: {
         type: String,
         required: true
     },
     professor: {
-        type: String,
-        required: true
+        type: mongoose.Schema.Types.ObjectId, ref: 'User',
+        required: true,
     },
     files: {
         type: String,
@@ -25,7 +24,10 @@ const courseSchema = new mongoose.Schema({
     description: {
         type: String,
         required: true
-    }
+    },
+    materials: [{
+        type: mongoose.Schema.Types.ObjectId, ref: 'Material',
+    }]
 })
 
 const courseModel = mongoose.model('Course', courseSchema)

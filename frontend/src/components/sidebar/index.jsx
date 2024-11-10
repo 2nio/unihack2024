@@ -3,12 +3,16 @@ import './index.css'
 import { FaFolder } from "react-icons/fa";
 import { FaUserFriends } from "react-icons/fa";
 import { FaHashtag } from "react-icons/fa";
+import { useNavigate } from 'react-router-dom';
 
 function Sidebar() {
+
+    const navigate = useNavigate()
+
     return (
         <nav className='sidebar'>
             <ul>
-                <li>
+                <li onClick={()=>navigate('/course')}>
                     <FaFolder />
                     <p>Materials</p>
                 </li>
@@ -16,7 +20,7 @@ function Sidebar() {
                     <FaUserFriends />
                     <p>Students</p>
                 </li>
-                <li>
+                <li onClick={()=>navigate('/course/grades')}>
                     <FaHashtag />
                     <p>Grades</p>
                 </li>

@@ -19,7 +19,7 @@ const getCourse = async (req, res) => {
 }
 const getAllCourses = async (req, res) => {
     try {
-        const Courses = await courseModel.find()
+        const Courses = await courseModel.find().populate('professor')
         res.status(200).json(Courses)
     } catch (error) {
         res.status(400).json({ error: error.message })

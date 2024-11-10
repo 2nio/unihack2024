@@ -3,20 +3,20 @@ const mongoose = require('mongoose')
 const materialSchema = new mongoose.Schema({
     title: {
         type: String,
-        required: true
     },
     description: {
         type: String,
-        required: true
     },
-    file: {
-        type: String,
-        required: true
-    },
+    files: [{
+        name: String,
+        public_id: String,
+        url: String,
+        description: String
+    }],
     course: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId, ref: 'Course',
         required: true
     }
 })
-const materialModel = mongoose.model('material', materialSchema)
+const materialModel = mongoose.model('Material', materialSchema)
 module.exports = materialModel
